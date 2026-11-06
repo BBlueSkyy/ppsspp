@@ -76,6 +76,7 @@ jobs:
           if [ -e android/build/*/apk/*/*/*.apk ]; then
             cp android/build/*/apk/*/*/*.apk ppsspp/
           fi
+          test -n "$(find ppsspp -type f -name '*.apk' -print -quit)" || { echo "No Android APK produced"; exit 1; }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
