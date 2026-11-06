@@ -1,5 +1,8 @@
 name: Manual Generate Android APK
 on:
+  push:
+    branches:
+      - ark-vshctrl
   workflow_dispatch:
     inputs:
 
@@ -18,7 +21,7 @@ on:
 jobs:
 
   apk:
-    name: Generate ${{ github.event.inputs.buildVariant }} APK
+    name: Generate ${{ github.event.inputs.buildVariant || 'NormalOptimized' }} APK
     runs-on: ubuntu-latest
 
     steps:
@@ -61,10 +64,10 @@ jobs:
           gradle --quiet androidGitVersion
       
       - name: Assemble APK
-        run: ./gradlew assemble${{ github.event.inputs.buildVariant }} --stacktrace
+        run: ./gradlew assemble${{ github.event.inputs.buildVariant || 'NormalOptimized' }} --stacktrace
       
       #- name: Gradle Test
-      #  run: bash ./gradlew test${{ github.event.inputs.buildVariant }}UnitTest --stacktrace
+      #  run: bash ./gradlew test${{ github.event.inputs.buildVariant || 'NormalOptimized' }}UnitTest --stacktrace
       
       - name: Package build
         run: |
@@ -77,5 +80,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: android-${{ github.event.inputs.buildVariant }} build
+          name: android-${{ github.event.inputs.buildVariant || 'NormalOptimized' }} build
           path: ppsspp/
