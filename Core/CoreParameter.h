@@ -38,6 +38,8 @@ enum GPUCore : int {
 struct VSHLaunch {
 	Path vshmain;  // Host path of vshmain.prx.
 	std::vector<u8> vshmainArgs;  // What the XMB passed when it launched the game.
+	// Disc present when the XMB booted. This is not necessarily the game ISO mounted later.
+	Path returnMountIso;
 };
 
 enum class FPSLimit {

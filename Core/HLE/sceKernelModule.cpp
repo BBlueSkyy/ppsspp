@@ -2939,7 +2939,7 @@ static bool RebootFromVSHInto(const std::string &filename) {
 		}
 		BootRequest request;
 		request.fileToStart = hostPath;
-		request.launchedFromVSH = VSHLaunch{ PSP_CoreParameter().fileToStart, g_vshmainArgs };
+		request.launchedFromVSH = VSHLaunch{ PSP_CoreParameter().fileToStart, g_vshmainArgs, PSP_CoreParameter().mountIso };
 		PSP_RequestBoot(request);
 		return true;
 	} else if (startsWith(filename, "ms0:/PSP/GAME") && endsWithNoCase(filename, "/EBOOT.PBP")) {
@@ -2959,7 +2959,7 @@ static bool RebootFromVSHInto(const std::string &filename) {
 	if (hostPath != disc) {
 		request.mountIso = disc;
 	}
-	request.launchedFromVSH = VSHLaunch{ PSP_CoreParameter().fileToStart, g_vshmainArgs };
+	request.launchedFromVSH = VSHLaunch{ PSP_CoreParameter().fileToStart, g_vshmainArgs, PSP_CoreParameter().mountIso };
 	PSP_RequestBoot(request);
 	return true;
 }
@@ -3043,14 +3043,17 @@ static bool GetExitToVSHRequest(BootRequest *request) {
 	if (launchedFromVSH) {
 		request->fileToStart = launchedFromVSH->vshmain;
 		request->vshmainArgs = VshmainReturnArgs(launchedFromVSH->vshmainArgs);
+		// __UmdGetPath() here would be the just-quit game ISO, which can make the XMB
+		// auto-start that game again. Restore the original XMB disc instead.
+		request->mountIso = launchedFromVSH->returnMountIso;
 	} else if (PSP_CoreParameter().fileToStart.GetFilename() == "vshmain.prx") {
 		// Loaded in place: the XMB's own boot file is what we started from.
 		request->fileToStart = PSP_CoreParameter().fileToStart;
 		request->vshmainArgs = VshmainReturnArgs(g_vshmainArgs);
+		request->mountIso = PSP_CoreParameter().mountIso;
 	} else {
 		return false;
 	}
-	request->mountIso = __UmdGetPath();
 	return true;
 }
 
@@ -3075,9 +3078,9 @@ bool __KernelExitToVSH(MIPSState *mips) {
 	const std::optional<VSHLaunch> &launchedFromVSH = PSP_CoreParameter().launchedFromVSH;
 	if (launchedFromVSH) {
 		BootRequest request;
-		request.fileToStart = launchedFromVSH->vshmain;
-		request.mountIso = __UmdGetPath();
-		request.vshmainArgs = VshmainReturnArgs(launchedFromVSH->vshmainArgs);
+		if (!GetExitToVSHRequest(&request)) {
+			return false;
+		}
 		PSP_RequestBoot(request);
 		__KernelSwitchOffThread("back to the XMB");
 		return true;
