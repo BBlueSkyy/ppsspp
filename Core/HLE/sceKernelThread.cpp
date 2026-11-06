@@ -276,7 +276,7 @@ class ActionAfterExitCallback : public PSPAction {
 public:
 	ActionAfterExitCallback() {}
 	void run(MipsCall &call) override {
-		INFO_LOG(Log::sceKernel, "Exit callback returned (v0 = %08x). Powering down.", currentMIPS->r[MIPS_REG_V0]);
+		NOTICE_LOG(Log::sceKernel, "VSH trace: exit callback returned result=%08x toVSH=%d coreState=%d", currentMIPS->r[MIPS_REG_V0], toVSH, (int)coreState);
 		g_exitCallbackPending = false;
 		// The callback may have already powered down by calling sceKernelExitGame - that's fine,
 		// Core_Stop is idempotent. Either way, the host will see CORE_POWERDOWN and tear the game down.

@@ -963,7 +963,7 @@ void BootRequest::ApplyTo(CoreParameter *coreParam) const {
 }
 
 void PSP_RequestBoot(const BootRequest &request) {
-	INFO_LOG(Log::Loader, "Rebooting into %s (disc: %s)", request.fileToStart.c_str(), request.mountIso.c_str());
+	NOTICE_LOG(Log::Loader, "VSH trace: boot request target=%s disc=%s fromVSH=%d returnArgs=%zu", request.fileToStart.c_str(), request.mountIso.c_str(), request.launchedFromVSH.has_value(), request.vshmainArgs.size());
 	{
 		std::lock_guard<std::mutex> guard(g_bootRequestLock);
 		g_bootRequest = request;

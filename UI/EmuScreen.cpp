@@ -1427,6 +1427,7 @@ void EmuScreen::update() {
 	// The emulated system asking for a reboot: the XMB starting a game, or a game going back to it.
 	BootRequest request;
 	if (coreState == CORE_POWERDOWN && PSP_GetBootState() == BootState::Complete && !bootPending_ && PSP_TakeBootRequest(&request)) {
+		NOTICE_LOG(Log::Boot, "VSH trace: frontend boot target=%s disc=%s fromVSH=%d returnArgs=%zu", request.fileToStart.c_str(), request.mountIso.c_str(), request.launchedFromVSH.has_value(), request.vshmainArgs.size());
 		Achievements::UnloadGame();
 		PSP_Shutdown(true);
 		screenManager()->cancelScreensAbove(this);

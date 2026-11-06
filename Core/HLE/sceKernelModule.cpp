@@ -2998,7 +2998,7 @@ int sceKernelLoadExec(MIPSState *mips, const char *filename, u32 paramPtr) {
 			const u8 *args = Memory::GetPointerUnchecked(vshParam->vshmainArgs);
 			g_vshmainArgs.assign(args, args + vshParam->vshmainArgsSize);
 		}
-		INFO_LOG(Log::sceModule, "Keeping %d bytes of vshmain args", (int)g_vshmainArgs.size());
+		NOTICE_LOG(Log::sceModule, "VSH trace: XMB loadexec target=%s, originalDisc=%s, args=%zu", exec_filename.c_str(), PSP_CoreParameter().mountIso.c_str(), g_vshmainArgs.size());
 		if (RebootFromVSHInto(exec_filename)) {
 			__KernelSwitchOffThread("XMB started a game");
 			return hleLogInfo(Log::sceModule, 0, "rebooting into it");
@@ -3067,7 +3067,7 @@ bool __KernelRequestExitToVSH() {
 	if (!GetExitToVSHRequest(&request)) {
 		return false;
 	}
-	INFO_LOG(Log::sceModule, "Quitting the game: back to the XMB");
+	NOTICE_LOG(Log::sceModule, "VSH trace: HOME exit to XMB target=%s, disc=%s, returnArgs=%zu", request.fileToStart.c_str(), request.mountIso.c_str(), request.vshmainArgs.size());
 	// Stops the core; the frontend then boots the XMB like anything else.
 	PSP_RequestBoot(request);
 	return true;
@@ -3081,6 +3081,7 @@ bool __KernelExitToVSH(MIPSState *mips) {
 		if (!GetExitToVSHRequest(&request)) {
 			return false;
 		}
+		NOTICE_LOG(Log::sceModule, "VSH trace: sceKernelExitGame to XMB target=%s, disc=%s, returnArgs=%zu", request.fileToStart.c_str(), request.mountIso.c_str(), request.vshmainArgs.size());
 		PSP_RequestBoot(request);
 		__KernelSwitchOffThread("back to the XMB");
 		return true;

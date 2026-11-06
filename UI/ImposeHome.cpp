@@ -630,6 +630,7 @@ void ImposeHomeScreen::Choose(bool quit) {
 	// The game still shouldn't get input meanwhile (TODO: though nothing enforces this?)
 	// and "Please wait..." stays up until it's gone.
 	state_ = State::QUITTING;
+	NOTICE_LOG(Log::System, "VSH trace: HOME Yes game=%s canReturnToXMB=%d", PSP_CoreParameter().fileToStart.c_str(), __KernelCanExitToVSH());
 	if (!__KernelIsExitCallbackPending() && __KernelInvokeRegisteredExitCallback(__KernelCanExitToVSH())) {
 		INFO_LOG(Log::System, "HOME: quitting, running the game's exit callback");
 		exitDeadline_ = time_now_d() + 4.0;
